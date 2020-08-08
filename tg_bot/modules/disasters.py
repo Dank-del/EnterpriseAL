@@ -322,9 +322,6 @@ def addSardegna(bot: Bot, update: Update, args: List[str]) -> str:
 @gloggable
 def removesudo(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message
-    user = update.effective_user
-    chat = update.effective_chat
-
     user_id = extract_user(message, args)
     user_member = bot.getChat(user_id)
 
@@ -344,9 +341,12 @@ def removesudo(bot: Bot, update: Update, args: List[str]) -> str:
         with open(ELEVATED_USERS_FILE, 'w') as outfile:
             json.dump(data, outfile, indent=4)
 
+        user = update.effective_user
         log_message = (f"#UNSUDO\n"
                        f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
                        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+
+        chat = update.effective_chat
 
         if chat.type != 'private':
             log_message = "<b>{}:</b>\n".format(html.escape(chat.title)) + log_message
@@ -363,9 +363,6 @@ def removesudo(bot: Bot, update: Update, args: List[str]) -> str:
 @gloggable
 def removesupport(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message
-    user = update.effective_user
-    chat = update.effective_chat
-
     user_id = extract_user(message, args)
     user_member = bot.getChat(user_id)
 
@@ -385,9 +382,12 @@ def removesupport(bot: Bot, update: Update, args: List[str]) -> str:
         with open(ELEVATED_USERS_FILE, 'w') as outfile:
             json.dump(data, outfile, indent=4)
 
+        user = update.effective_user
         log_message = (f"#UNSUPPORT\n"
                        f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
                        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+
+        chat = update.effective_chat
 
         if chat.type != 'private':
             log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
@@ -404,9 +404,6 @@ def removesupport(bot: Bot, update: Update, args: List[str]) -> str:
 @gloggable
 def removewhitelist(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message
-    user = update.effective_user
-    chat = update.effective_chat
-
     user_id = extract_user(message, args)
     user_member = bot.getChat(user_id)
 
@@ -426,9 +423,12 @@ def removewhitelist(bot: Bot, update: Update, args: List[str]) -> str:
         with open(ELEVATED_USERS_FILE, 'w') as outfile:
             json.dump(data, outfile, indent=4)
 
+        user = update.effective_user
         log_message = (f"#UNWHITELIST\n"
                        f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
                        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+
+        chat = update.effective_chat
 
         if chat.type != 'private':
             log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message
@@ -444,9 +444,6 @@ def removewhitelist(bot: Bot, update: Update, args: List[str]) -> str:
 @gloggable
 def removeSardegna(bot: Bot, update: Update, args: List[str]) -> str:
     message = update.effective_message
-    user = update.effective_user
-    chat = update.effective_chat
-
     user_id = extract_user(message, args)
     user_member = bot.getChat(user_id)
 
@@ -466,9 +463,12 @@ def removeSardegna(bot: Bot, update: Update, args: List[str]) -> str:
         with open(ELEVATED_USERS_FILE, 'w') as outfile:
             json.dump(data, outfile, indent=4)
 
+        user = update.effective_user
         log_message = (f"#UNSARDEGNA\n"
                        f"<b>Admin:</b> {mention_html(user.id, user.first_name)}\n"
                        f"<b>User:</b> {mention_html(user_member.id, user_member.first_name)}")
+
+        chat = update.effective_chat
 
         if chat.type != 'private':
             log_message = f"<b>{html.escape(chat.title)}:</b>\n" + log_message

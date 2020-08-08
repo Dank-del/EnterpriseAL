@@ -66,8 +66,6 @@ tg.CommandHandler = CustomCommandHandler
 # NOT ASYNC
 def restr_members(bot, chat_id, members, messages=False, media=False, other=False, previews=False):
     for mem in members:
-        if mem.user in SUDO_USERS or mem.user in DEV_USERS:
-            pass
         try:
             bot.restrict_chat_member(chat_id, mem.user,
                                      can_send_messages=messages,
@@ -103,11 +101,11 @@ def locktypes(bot: Bot, update: Update):
 @loggable
 def lock(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat
-    user = update.effective_user
     message = update.effective_message
 
     if can_delete(chat, bot.id):
         if len(args) >= 1:
+            user = update.effective_user
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=True)
                 message.reply_text("Locked {} messages for all non-admins!".format(args[0]))
@@ -156,11 +154,11 @@ def lock(bot: Bot, update: Update, args: List[str]) -> str:
 @loggable
 def unlock(bot: Bot, update: Update, args: List[str]) -> str:
     chat = update.effective_chat
-    user = update.effective_user
     message = update.effective_message
 
     if is_user_admin(chat, message.from_user.id):
         if len(args) >= 1:
+            user = update.effective_user
             if args[0] in LOCK_TYPES:
                 sql.update_lock(chat.id, args[0], locked=False)
                 message.reply_text(f"Unlocked {args[0]} for everyone!")
@@ -226,9 +224,7 @@ def del_lockables(bot: Bot, update: Update):
                 try:
                     message.delete()
                 except BadRequest as excp:
-                    if excp.message == "Message to delete not found":
-                        pass
-                    else:
+                    if excp.message != "Message to delete not found":
                         LOGGER.exception("ERROR in lockables")
 
             break
@@ -244,15 +240,17 @@ def rest_handler(bot: Bot, update: Update):
             try:
                 msg.delete()
             except BadRequest as excp:
-                if excp.message == "Message to delete not found":
-                    pass
-                else:
+                if excp.message != "Message to delete not found":
                     LOGGER.exception("ERROR in restrictions")
             break
 
 
 def format_lines(lst, spaces):
-    widths = [max([len(str(lst[i][j])) for i in range(len(lst))]) for j in range(len(lst[0]))]
+    widths = [
+        max(len(str(lst[i][j])) for i in range(len(lst)))
+        for j in range(len(lst[0]))
+    ]
+
 
     lines = [(" " * spaces).join(
         [" " * int((widths[i] - len(str(r[i]))) / 2) + str(r[i])

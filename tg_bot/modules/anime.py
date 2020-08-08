@@ -24,8 +24,7 @@ def getKitsu(mal):
     link = f'https://kitsu.io/api/edge/mappings?filter[external_site]=myanimelist/anime&filter[external_id]={mal}'
     result = requests.get(link).json()['data'][0]['id']
     link = f'https://kitsu.io/api/edge/mappings/{result}/item?fields[anime]=slug'
-    kitsu = requests.get(link).json()['data']['id']
-    return kitsu
+    return requests.get(link).json()['data']['id']
 
 
 def getPosterLink(mal):
@@ -288,7 +287,7 @@ def character(bot: Bot, update: Update):
     about_string = ' '.join(about)
 
     for entity in character:
-        if character[entity] == None:
+        if character[entity] is None:
             character[entity] = "Unknown"
 
     caption += f"\n*About*: {about_string}..."
@@ -343,7 +342,7 @@ def user(bot: Bot, update: Update):
     user_joined_date_formatted = user_joined_date.strftime(date_format)
 
     for entity in user:
-        if user[entity] == None:
+        if user[entity] is None:
             user[entity] = "Unknown"
 
     about = user['about'].split(" ", 60)
@@ -404,15 +403,15 @@ def button(bot, update):
     query_type = data[0]
     original_user_id = int(data[1])
 
-    user_and_admin_list = [original_user_id, OWNER_ID] + SUDO_USERS + DEV_USERS
-
     bot.answer_callback_query(query.id)
     if query_type == "anime_close":
+        user_and_admin_list = [original_user_id, OWNER_ID] + SUDO_USERS + DEV_USERS
+
         if query.from_user.id in user_and_admin_list:
             message.delete()
         else:
             query.answer("You are not allowed to use this.")
-    elif query_type == "anime_anime" or query_type == "anime_manga":
+    elif query_type in ["anime_anime", "anime_manga"]:
         mal_id = data[2]
         if query.from_user.id == original_user_id:
             message.delete()

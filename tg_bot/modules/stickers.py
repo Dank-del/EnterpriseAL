@@ -29,11 +29,11 @@ def stickerid(bot: Bot, update: Update):
 @run_async
 def getsticker(bot: Bot, update: Update):
     msg = update.effective_message
-    chat_id = update.effective_chat.id
     if msg.reply_to_message and msg.reply_to_message.sticker:
         file_id = msg.reply_to_message.sticker.file_id
         new_file = bot.get_file(file_id)
         new_file.download('sticker.png')
+        chat_id = update.effective_chat.id
         bot.send_document(chat_id, document=open('sticker.png', 'rb'))
         os.remove("sticker.png")
     else:
@@ -68,7 +68,7 @@ def kang(bot: Bot, update: Update, args: List[str]):
             if (im.width and im.height) < 512:
                 size1 = im.width
                 size2 = im.height
-                if im.width > im.height:
+                if size1 > size2:
                     scale = 512 / size1
                     size1new = 512
                     size2new = size2 * scale
@@ -95,9 +95,8 @@ def kang(bot: Bot, update: Update, args: List[str]):
             print(e)
             return
         except TelegramError as e:
-            if e.message == "Stickerset_invalid":
-                with open('kangsticker.png', 'rb') as sticker:
-                    makepack_internal(msg, user, sticker, sticker_emoji, bot)
+            if e.message == "Invalid sticker emojis":
+                msg.reply_text("Invalid emoji(s).")
             elif e.message == "Sticker_png_dimensions":
                 im.save(kangsticker, "PNG")
                 with open('kangsticker.png', 'rb') as sticker:
@@ -106,10 +105,11 @@ def kang(bot: Bot, update: Update, args: List[str]):
                 msg.reply_text(f"Sticker successfully added to [pack](t.me/addstickers/{packname})\n"
                                f"Emoji is: {sticker_emoji}",
                                parse_mode=ParseMode.MARKDOWN)
-            elif e.message == "Invalid sticker emojis":
-                msg.reply_text("Invalid emoji(s).")
             elif e.message == "Stickers_too_much":
                 msg.reply_text("Max packsize reached. Press F to pay respecc.")
+            elif e.message == "Stickerset_invalid":
+                with open('kangsticker.png', 'rb') as sticker:
+                    makepack_internal(msg, user, sticker, sticker_emoji, bot)
             print(e)
     elif args:
         try:
@@ -125,7 +125,7 @@ def kang(bot: Bot, update: Update, args: List[str]):
             if (im.width and im.height) < 512:
                 size1 = im.width
                 size2 = im.height
-                if im.width > im.height:
+                if size1 > size2:
                     scale = 512 / size1
                     size1new = 512
                     size2new = size2 * scale
@@ -154,13 +154,13 @@ def kang(bot: Bot, update: Update, args: List[str]):
             print(e)
             return
         except TelegramError as e:
-            if e.message == "Stickerset_invalid":
-                with open('kangsticker.png', 'rb') as sticker:
-                    makepack_internal(msg, user, sticker, sticker_emoji, bot)
+            if e.message == "Invalid sticker emojis":
+                msg.reply_text("Invalid emoji(s).")
             elif e.message == "Sticker_png_dimensions":
                 msg.reply_text("Could not resize image to the correct dimensions.")
-            elif e.message == "Invalid sticker emojis":
-                msg.reply_text("Invalid emoji(s).")
+            elif e.message == "Stickerset_invalid":
+                with open('kangsticker.png', 'rb') as sticker:
+                    makepack_internal(msg, user, sticker, sticker_emoji, bot)
             print(e)
     else:
         msg.reply_text(
@@ -183,12 +183,12 @@ def makepack_internal(msg, user, png_sticker, emoji, bot):
                                              emojis=emoji)
     except TelegramError as e:
         print(e)
-        if e.message == "Sticker set name is already occupied":
-            msg.reply_text(f"Your pack can be found [here](t.me/addstickers/{packname})",
-                           parse_mode=ParseMode.MARKDOWN)
-        elif e.message == "Peer_id_invalid":
+        if e.message == "Peer_id_invalid":
             msg.reply_text("Contact me in PM first.", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton(
                 text="Start", url=f"t.me/{bot.username}")]]))
+        elif e.message == "Sticker set name is already occupied":
+            msg.reply_text(f"Your pack can be found [here](t.me/addstickers/{packname})",
+                           parse_mode=ParseMode.MARKDOWN)
         return
 
     if success:
